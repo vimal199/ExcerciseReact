@@ -8,8 +8,23 @@ const Button = (props) => {
   )
 }
 const Statistics = (props) => {
+  console.log(props.paramVal[0])
   return (
-    <p> {props.param} {props.paramVal}</p>
+    <>
+      <StatisticLine param='good' paramval={props.paramVal[0]} />
+      <StatisticLine param='neutral' paramval={props.paramVal[1]} />
+      <StatisticLine param='bad' paramval={props.paramVal[2]} />
+      <StatisticLine param='total' paramval={props.paramVal[3]} />
+      <StatisticLine param='Average' paramval={props.paramVal[4]} />
+      <StatisticLine param='positive' paramval={props.paramVal[5]} />
+    </>
+  )
+
+}
+const StatisticLine = (props) => {
+  console.log(props)
+  return (
+    <p> {props.param} {props.paramval}</p>
   )
 }
 const App = () => {
@@ -37,12 +52,7 @@ const App = () => {
         <Button handleClick={() => { setNeutral(neutral + 1) }} text={'Neutral'}></Button>
         <Button handleClick={() => { setBad(bad + 1) }} text='Bad'></Button>
         <h2>Statistics</h2>
-        <Statistics paramVal={good} param='good'></Statistics>
-        <Statistics paramVal={neutral} param='neutral'></Statistics>
-        <Statistics paramVal={bad} param='bad'></Statistics>
-        <Statistics paramVal={total} param='total'></Statistics>
-        <Statistics paramVal={Average} param='Average'></Statistics>
-        <Statistics paramVal={positive} param='positive'></Statistics>
+        <Statistics paramVal={[good, neutral, bad, total, Average, positive]} />
       </div>
     )
 }
