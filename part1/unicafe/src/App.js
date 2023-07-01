@@ -11,12 +11,14 @@ const Statistics = (props) => {
   console.log(props.paramVal[0])
   return (
     <>
-      <StatisticLine param='good' paramval={props.paramVal[0]} />
-      <StatisticLine param='neutral' paramval={props.paramVal[1]} />
-      <StatisticLine param='bad' paramval={props.paramVal[2]} />
-      <StatisticLine param='total' paramval={props.paramVal[3]} />
-      <StatisticLine param='Average' paramval={props.paramVal[4]} />
-      <StatisticLine param='positive' paramval={props.paramVal[5]} />
+      <table>
+        <StatisticLine param='good' paramval={props.paramVal[0]} />
+        <StatisticLine param='neutral' paramval={props.paramVal[1]} />
+        <StatisticLine param='bad' paramval={props.paramVal[2]} />
+        <StatisticLine param='total' paramval={props.paramVal[3]} />
+        <StatisticLine param='Average' paramval={props.paramVal[4]} />
+        <StatisticLine param='positive' paramval={props.paramVal[5]} />
+      </table>
     </>
   )
 
@@ -24,7 +26,7 @@ const Statistics = (props) => {
 const StatisticLine = (props) => {
   console.log(props)
   return (
-    <p> {props.param} {props.paramval}</p>
+    <tbody><tr><td>{props.param}</td><td>{props.paramval}</td></tr></tbody>
   )
 }
 const App = () => {
@@ -32,8 +34,8 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
   const total = good + neutral + bad
-  const Average = (1 * good + 0 * neutral - 1 * bad) / total
-  const positive = (good / (total)) * 100
+  const Average = ((1 * good + 0 * neutral - 1 * bad) / total).toFixed(2)
+  const positive = ((good / (total)) * 100).toFixed(2)
   if (total === 0)
     return (
       <div>
