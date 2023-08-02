@@ -13,14 +13,40 @@ const CountryView = ({ names }) => {
     </ul>
   )
 }
-const WarningMsg = ({ isWarning }) => {
-
+const CountryDetails = (props) => {
+  const country = props.detailedCountry
+  const langs = country.languages
+  console.log(country);
+  const langs_arr = []
+  for (let lang in langs) {
+    console.log(langs[lang]);
+    langs_arr.push(langs[lang])
+  }
+  return (
+    <>
+      <h2>{country.name.common}</h2>
+      <p>capital {country.capital}</p>
+      <p>area {country.area}</p>
+      <br />
+      <h1>Languages</h1>
+      <ul>
+        {
+          langs_arr.map(
+            (lang, index) => <li key={index}>{lang}</li>
+          )
+        }
+      </ul>
+      <img src={country.flags.png} alt={country.flags.alt}></img>
+    </>
+  )
 }
 function App() {
   const [country, setCountry] = useState('')
   const [countries, setCountries] = useState([])
   const [filterednames, setFilterednames] = useState([])
   const [warning, setWarning] = useState(false)
+  const [singlecountry, setSinglecountry] = useState(false)
+  const [detailedCountry, setDetailedCountry] = useState({})
   const handleCountryChange = (event) => {
     const country_txt = event.target.value
     setCountry(country_txt)
@@ -37,12 +63,21 @@ function App() {
       console.log('Filtered list is ', names);
       setFilterednames(names);
       if (names.length > 10) {
-        //alert('Too many matches,specify another filter');
-        //setCountry('');
         setFilterednames([]);
         setWarning(true)
-      } else {
+      } else if (names.length == 1) {
         setWarning(false)
+        setSinglecountry(true)
+        var detailedCountry_temp = countries.find(
+          (country) => {
+            return country.name.common == names[0];
+          }
+        )
+        setDetailedCountry(detailedCountry_temp);
+      }
+      else {
+        setWarning(false)
+        setSinglecountry(false)
       }
     }
   }
@@ -66,7 +101,7 @@ function App() {
     <div>
       <h1>find countries</h1>
       <input value={country} onChange={handleCountryChange}></input>
-      <CountryView names={filterednames}></CountryView>
+      {singlecountry ? <CountryDetails detailedCountry={detailedCountry}></CountryDetails> : <CountryView names={filterednames}></CountryView>}
       {warning ? <p>too many matches,specify another filter</p> : null}
     </div>
   );
