@@ -1,19 +1,42 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import countryService from './services/countries'
-const CountryView = ({ names }) => {
+import countries from './services/countries';
+const CountryView = ({ names, countries, showCountry, setShowCountry }) => {
   if (Array.isArray(names) && names.length === 0) {
     return null;
   }
+  var detailedCountry_temp = {}
+  const handleShow = (country) => {
+    console.log('detailed country', country);
+    detailedCountry_temp = countries.find(
+      (country_in) => {
+        return country_in.name.common == country;
+      }
+    )
+    console.log('detailed country json', detailedCountry_temp);
+    setShowCountry(detailedCountry_temp)
+    //<CountryDetails detailedCountry={detailedCountry_temp}></CountryDetails>;
+  }
   return (
-    <ul>
-      {names.map(
-        (country, index) => <li key={index} > {country} </li>
-      )}
-    </ul>
+    <>
+      <ul>
+        {names.map(
+          (country, index) => {
+            return (<li key={index} > {country}
+              <button type='button' onClick={() => handleShow(country)}>show</button>
+            </li>)
+          }
+        )}
+
+      </ul>
+      <CountryDetails detailedCountry={showCountry}></CountryDetails>
+    </>
   )
 }
 const CountryDetails = (props) => {
+  if (Object.keys(props.detailedCountry).length === 0)
+    return
   const country = props.detailedCountry
   const langs = country.languages
   console.log(country);
@@ -47,6 +70,7 @@ function App() {
   const [warning, setWarning] = useState(false)
   const [singlecountry, setSinglecountry] = useState(false)
   const [detailedCountry, setDetailedCountry] = useState({})
+  const [showCountry, setShowCountry] = useState({})
   const handleCountryChange = (event) => {
     const country_txt = event.target.value
     setCountry(country_txt)
@@ -101,7 +125,7 @@ function App() {
     <div>
       <h1>find countries</h1>
       <input value={country} onChange={handleCountryChange}></input>
-      {singlecountry ? <CountryDetails detailedCountry={detailedCountry}></CountryDetails> : <CountryView names={filterednames}></CountryView>}
+      {singlecountry ? <CountryDetails detailedCountry={detailedCountry}></CountryDetails> : <CountryView names={filterednames} countries={countries} showCountry={showCountry} setShowCountry={setShowCountry}  ></CountryView>}
       {warning ? <p>too many matches,specify another filter</p> : null}
     </div>
   );
