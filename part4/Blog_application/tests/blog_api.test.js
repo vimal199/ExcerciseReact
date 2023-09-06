@@ -1,4 +1,9 @@
 const listHelper = require('../utils/list_helper')
+const mongoose = require('mongoose')
+const supertest = require('supertest')
+const app = require('../app')
+const api = supertest(app)
+const Blog = require('../models/Blog')
 test('Dummy returns one', () => {
     const blogs = []
     const result = listHelper.dummy(blogs)
@@ -80,11 +85,41 @@ describe('total likes ', () => {
         expect(result.blogs).toBe(3)
 
     })
-    test.only('blog posts have the largest amount of likes', () => {
+    test('blog posts have the largest amount of likes', () => {
         const result = listHelper.mostLikes(blogs)
         expect(result.likes).toBe(17)
         expect(result.author).toBe("Edsger W. Dijkstra")
     }
     )
 }
+)
+test('Blogs are returned as json', async () => {
+    const x = await api
+        .get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+    console.log('x is ', x);
+    expect(x.body[0].id).toBeDefined()
+}, 100000)
+test('Blogs are saved to db as json after post request', async () => {
+    const blogsAtStart = await api.get('/api/blogs')
+    const blogtobeSaved = {
+        title: 'node',
+        author: 'john',
+        url: 'http@1234.com',
+        likes: 4
+    }
+    const returned_Blog = await api.post('/api/blogs').send(blogtobeSaved)
+    const blogsAtEnd = await api.get('/api/blogs')
+    expect(blogsAtEnd.body).toHaveLength(blogsAtStart.body.length + 1)
+
+
+})
+test('Request is default to zero if its value missing', async () => {
+
+})
+afterAll(
+    async () => {
+        await mongoose.connection.close()
+    }
 )
