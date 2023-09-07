@@ -112,12 +112,46 @@ test('Blogs are saved to db as json after post request', async () => {
     const returned_Blog = await api.post('/api/blogs').send(blogtobeSaved)
     const blogsAtEnd = await api.get('/api/blogs')
     expect(blogsAtEnd.body).toHaveLength(blogsAtStart.body.length + 1)
-
-
 })
 test('Request is default to zero if its value missing', async () => {
+    const test_blog = {
+        title: 'node',
+        author: 'john',
+        url: 'http@1234.com'
+    }
+    const ret_blog = await api.post('/api/blogs').send(test_blog)
+    console.log('ret_blog', ret_blog)
+    expect(ret_blog.body.likes).toBe(0)
 
+}, 100000)
+test('Backend respond with 400 if title/url is missing', async () => {
+    const test_blog = {
+        /* title: 'node', */
+        url: 'http@1234.com',
+        author: 'john'
+    }
+    const ret_blog = await api.post('/api/blogs').send(test_blog).expect(400)
+    console.log('ret_blog', ret_blog)
 })
+test('Testing deleting a blog', async () => {
+    const blogsAtStart = await api.get('/api/blogs')
+    await api.delete('/api/blogs/64f8d387c177780fb9978c78').send().expect(204)
+    const blogsAtEnd = await api.get('/api/blogs')
+    expect(blogsAtEnd.body).toHaveLength(blogsAtStart.body.length - 1)
+}
+)
+test.only('Testing updating a blog', async () => {
+    const blogtobeSaved = {
+        title: 'node',
+        author: 'john',
+        url: 'http@1234.com',
+        likes: 23,
+        id: '64f8e4e15783b4e66c719cb9'
+    }
+    const returned_blog = await api.put('/api/blogs/64f8e4e15783b4e66c719cb9').send(blogtobeSaved)
+    expect(returned_blog.body.likes).toBe(23)
+}
+)
 afterAll(
     async () => {
         await mongoose.connection.close()
