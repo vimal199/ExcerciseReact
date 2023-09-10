@@ -109,7 +109,13 @@ test('Blogs are saved to db as json after post request', async () => {
         url: 'http@1234.com',
         likes: 4
     }
-    const returned_Blog = await api.post('/api/blogs').send(blogtobeSaved)
+    let auth_token = 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkRhZGZkZmRmIiwiaWQiOiI2NGZjOTlhYjkzNWNiZGU1MmUyNWFmMWIiLCJpYXQiOjE2OTQzNzIxMjJ9.xEbE7TjS5M-_ue9K615HTgWScp1qvgCQ5NMQ9MzsYKQ'
+    const returned_Blog = await api
+        .post('/api/blogs')
+        .send(blogtobeSaved)
+        .set('Authorization', auth_token)
+
+    console.log('returned_Blog is ', returned_Blog);
     const blogsAtEnd = await api.get('/api/blogs')
     expect(blogsAtEnd.body).toHaveLength(blogsAtStart.body.length + 1)
 })
@@ -133,14 +139,15 @@ test('Backend respond with 400 if title/url is missing', async () => {
     const ret_blog = await api.post('/api/blogs').send(test_blog).expect(400)
     console.log('ret_blog', ret_blog)
 })
-test('Testing deleting a blog', async () => {
+test.only('Testing deleting a blog', async () => {
+    let auth_token = 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkRhZGZkZmRmIiwiaWQiOiI2NGZjOTlhYjkzNWNiZGU1MmUyNWFmMWIiLCJpYXQiOjE2OTQzNzIxMjJ9.xEbE7TjS5M-_ue9K615HTgWScp1qvgCQ5NMQ9MzsYKQ'
     const blogsAtStart = await api.get('/api/blogs')
-    await api.delete('/api/blogs/64f8d387c177780fb9978c78').send().expect(204)
+    await api.delete('/api/blogs/64fe14f37e17191e36451d6f').send().set('Authorization', auth_token)
     const blogsAtEnd = await api.get('/api/blogs')
     expect(blogsAtEnd.body).toHaveLength(blogsAtStart.body.length - 1)
 }
 )
-test.only('Testing updating a blog', async () => {
+test('Testing updating a blog', async () => {
     const blogtobeSaved = {
         title: 'node',
         author: 'john',
@@ -150,6 +157,19 @@ test.only('Testing updating a blog', async () => {
     }
     const returned_blog = await api.put('/api/blogs/64f8e4e15783b4e66c719cb9').send(blogtobeSaved)
     expect(returned_blog.body.likes).toBe(23)
+}
+)
+test('log fails with the proper status code 401 Unauthorized if a token is not provided', async () => {
+    const blogtobeSaved = {
+        title: 'node',
+        author: 'john',
+        url: 'http@1234.com',
+        likes: 4
+    }
+    await api
+        .post('/api/blogs')
+        .send(blogtobeSaved)
+        .expect(401)
 }
 )
 afterAll(
