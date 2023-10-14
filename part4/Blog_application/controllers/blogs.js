@@ -36,11 +36,13 @@ blogsRouter.post('/', async (request, response) => {
     }
     const user = request.user
     //console.log('user is ', user);
+    // adding author in back end now
     const blog = new Blog({
         title: body.title,
         url: body.url,
         likes: body.likes,
-        user: user.id
+        user: user.id,
+        author: body.author
     })
     const savedBlog = await blog.save()
     logger.info('saved Blog is ', savedBlog)
