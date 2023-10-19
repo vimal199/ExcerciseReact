@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import loginService from './services/login'
 import blogService from './services/blogs'
 import Notification from './components/Notification'
+import Toggable from './components/Toggable'
 const App = () => {
   console.log('Starting Blog application');
   const [blogs, setBlogs] = useState([])
@@ -15,9 +16,19 @@ const App = () => {
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
   const [message, setMessage] = useState('')
+  const toggableRef = useRef()
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
+    blogService.getAll().then(blogs => {
+      const sorted_list = blogs.sort((a, b) => {
+        if (a.likes > b.likes)
+          return 1
+        if (a.likes < b.likes)
+          return -1
+        return 0
+      }
+      )
+      setBlogs(sorted_list)
+    }
     )
 
   }, [])
@@ -66,7 +77,7 @@ const App = () => {
     setTimeout(() => {
       setMessage(null)
     }, 4000);
-
+    toggableRef.current.toggleVisibility()
   }
   const handleLoginSubmit = async (event) => {
     event.preventDefault()
@@ -87,18 +98,24 @@ const App = () => {
       }, 4000);
     }
   }
+
   const loginForm = () => {
     return (
+
       <LoginForm userName={userName} password={password} handleOnChangeUserName={handleOnChangeUserName} handleOnChangePassword={handleOnChangePassword} handleLoginSubmit={handleLoginSubmit} message={message}></LoginForm>
+
     )
   }
   const blogForm = () => {
     return (
-      <BlogForm title={title} handleChangeTitle={handleChangeTitle} author={author} handleChangeAuthor={handleChangeAuthor} url={url} handleChangeUrl={handleChangeUrl} handleSubmitBlog={handleSubmitBlog}>
-      </BlogForm>
+      <Toggable buttonLabel='create new blog' ref={toggableRef}>
+        <BlogForm title={title} handleChangeTitle={handleChangeTitle} author={author} handleChangeAuthor={handleChangeAuthor} url={url} handleChangeUrl={handleChangeUrl} handleSubmitBlog={handleSubmitBlog}>
+        </BlogForm>
+      </Toggable>
     )
   }
   /* Function definitions ends here.*/
+  // console.log('setBlogs at app ', setBlogs)
   return (
     <>
       {user == null && loginForm()}
@@ -107,10 +124,9 @@ const App = () => {
         <Notification message={message} status='success'></Notification>
         {user.name} logged in
         <input type="button" id='logout' value="logout" onClick={() => { window.localStorage.removeItem('loggedBloggedUser'); location.reload(); }}></input>
-        <h2>create new</h2>
         {blogForm()}
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} user={user} blogs={blogs} setBlogs={setBlogs} blogService={blogService} />
         )}
       </div>
       }

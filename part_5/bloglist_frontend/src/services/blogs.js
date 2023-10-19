@@ -16,4 +16,15 @@ const create = (savedBlog) => {
   const req = axios.post(baseUrl, savedBlog, config)
   return req.then(response => response.data)
 }
-export default { getAll, create, setToken }
+const updateFull = (id, inputBlog) => {
+  const request = axios.put(`${baseUrl}/${id}`, inputBlog)
+  return request.then(response => response.data)
+}
+const delete_blog = (id) => {
+  const config = {
+    headers: { Authorization: token }
+  }
+  const request = axios.delete(`${baseUrl}/${id}`, config)
+  return request.then(response => response.data)
+}
+export default { getAll, create, updateFull, delete_blog, setToken }
