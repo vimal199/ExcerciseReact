@@ -12,7 +12,7 @@ const BlogForm = ({ title, handleChangeTitle, author, handleChangeAuthor, url, h
                 <label htmlFor="url">url:</label>
                 <input type="text" id="url" name="url" value={url} onChange={handleChangeUrl}></input>
                 <br />
-                <button type="submit">create</button>
+                <button type="submit" id="bwcreate">create</button>
             </form>
         </>
     )

@@ -10,18 +10,11 @@ const Blog = ({ blog, user, blogs, setBlogs, blogService }) => {
   const handleClickView = () => {
     setStatus(status == 'view' ? 'hide' : 'view')
   }
+  /*commenting below for testing purpose*/
   const handleClickLikes = async () => {
     blog.likes += 1
     blog.user = user
     const updated_blog = await blogService.updateFull(blog.id, blog)
-    //console.log('updated_blog is ', updated_blog);
-    // setBlogs(blogs)
-    /* let i = 0
-    const index = blogs.findIndex(b => b.id === blog.id)*/
-    // console.log('updated_blog.like ', updated_blog.like);
-    /* blogs[index] = updated_blog
-     console.log('updated  blogs', blogs[index]);
-     setBlogs(blogs) */
     setLike(updated_blog.likes)
   }
   const handleDeleteBlog = async () => {
@@ -50,14 +43,14 @@ const Blog = ({ blog, user, blogs, setBlogs, blogService }) => {
     marginBottom: 5
   }
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
       {blog.title} {blog.author}
       <input type="button" onClick={handleClickView} value={status}></input>
-      <div style={toggleVisible}>
+      <div style={toggleVisible} className='blogDetails'>
         <p>{blog.url}</p>
-        <p>likes {like} <input type="button" onClick={handleClickLikes} value='likes'></input> </p>
+        <p>likes {like} <input type="button" onClick={handleClickLikes} value='likes' id='like'></input> </p>
         <p> {blog.user.name}</p>
-        <input style={deleteButtonHidden} type='button' onClick={handleDeleteBlog} value='remove'></input>
+        <input style={deleteButtonHidden} type='button' onClick={handleDeleteBlog} value='remove' className='deleteBlog'></input>
       </div>
     </div >
   )

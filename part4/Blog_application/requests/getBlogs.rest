@@ -10,3 +10,6 @@ Content-Type: application/json
   "likes": "2",
   "userId" : "64fc7dcf711bdf38e84caeed"
 }
+###
+POST http://localhost:3001/api/testing/reset
+Content-Type: application/json

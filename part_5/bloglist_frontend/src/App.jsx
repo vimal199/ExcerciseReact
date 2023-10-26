@@ -21,9 +21,9 @@ const App = () => {
     blogService.getAll().then(blogs => {
       const sorted_list = blogs.sort((a, b) => {
         if (a.likes > b.likes)
-          return 1
-        if (a.likes < b.likes)
           return -1
+        if (a.likes < b.likes)
+          return 1
         return 0
       }
       )
@@ -68,8 +68,18 @@ const App = () => {
       url: url
     }
     const saved_blog = await blogService.create(blogToBeSaved)
-    console.log('Form submitted ', saved_blog);
-    setBlogs(blogs.concat(saved_blog))
+    console.log('Form submitted ', saved_blog)
+    //const new_blogs = blogs.concat(saved_blog)
+    /*  const sorted_list = new_blogs.sort((a, b) => {
+       if (a.likes > b.likes)
+         return 1
+       if (a.likes < b.likes)
+         return -1
+       return 0
+     }
+     ) */
+    const new_blogs = [saved_blog].concat(blogs)
+    setBlogs(new_blogs)/////
     setTitle('')
     setAuthor('')
     setUrl('')
