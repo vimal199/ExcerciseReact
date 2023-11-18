@@ -10,9 +10,17 @@ const notifSlice = createSlice(
             },
             removeNotification(state, action) {
                 return ''
-            }
+            },
         }
     }
 )
+export const setNotification = (message, delay) => {
+    return async (dispatch) => {
+        setTimeout(() => {
+            dispatch(removeNotification())
+        }, delay)
+        dispatch(sendNotification(message))
+    }
+}
 export default notifSlice.reducer
 export const { sendNotification, removeNotification } = notifSlice.actions
