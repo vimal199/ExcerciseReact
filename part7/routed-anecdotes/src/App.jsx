@@ -85,7 +85,7 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' value={content.value} onChange={content.onChange} />
+          <input name='content' {...content} />
         </div>
         <div>
           author
@@ -96,6 +96,7 @@ const CreateNew = (props) => {
           <input name='info' value={info} onChange={(e) => setInfo(e.target.value)} />
         </div>
         <button>create</button>
+        <button type='button' onClick={(event) => { content.reset(); author.reset(); setInfo(''); event.preventDefault(); }}>reset</button>
       </form>
     </div>
   )
