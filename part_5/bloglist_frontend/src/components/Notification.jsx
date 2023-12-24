@@ -1,10 +1,13 @@
+import { useSelector } from "react-redux";
 const Notification = ({ message, status }) => {
   console.log("status is ", status);
-  if (message == "" || message == null) {
+  const messageByRedux = useSelector(state => state.message)
+  console.log('messageByRedux', messageByRedux);
+  if (messageByRedux == "" || messageByRedux == null) {
     return null;
   }
   return (
-    <div className={status === "success" ? "success" : "error"}>{message}</div>
+    <div className={status === "success" ? "success" : "error"}>{messageByRedux}</div>
   );
 };
 export default Notification;

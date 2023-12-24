@@ -5,14 +5,13 @@ const LoginForm = ({
   handleOnChangeUserName,
   password,
   handleOnChangePassword,
-  handleLoginSubmit,
-  message,
+  handleLoginSubmit
 }) => {
-  console.log("message in login form ", message);
+  // console.log("message in login form ", message);
   return (
     <>
       <h1>log in to application</h1>
-      <Notification message={message} status="error"></Notification>
+      <Notification status="error"></Notification>
       <form onSubmit={handleLoginSubmit}>
         <div>
           userName

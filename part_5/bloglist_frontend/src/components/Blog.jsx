@@ -1,11 +1,16 @@
 import { useState } from "react";
 import Notification from "./Notification";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { InitialiseBlogs, UpdateBlogsById, UpdateBlogs } from "../reducers/blogsReducer";
 //import blogService from '../services/blogs'
-const Blog = ({ blog, user, blogs, setBlogs, blogService }) => {
+const Blog = ({ blog, user, blogService }) => {
   console.log("user in blog enter", blog.user.userName);
   //console.log('setBlogs ', setBlogs)
   const [status, setStatus] = useState("view");
   const [like, setLike] = useState(blog.likes);
+  const blogs = useSelector(state => state.blogs);
+  const dispatch = useDispatch();
   const deleteButtonHidden = {
     display: user.userName == blog.user.userName ? "" : "none",
   };
@@ -14,10 +19,13 @@ const Blog = ({ blog, user, blogs, setBlogs, blogService }) => {
   };
   /*commenting below for testing purpose*/
   const handleClickLikes = async () => {
-    blog.likes += 1;
-    blog.user = user;
-    const updated_blog = await blogService.updateFull(blog.id, blog);
+    console.log('Liked blog ', blog);
+    /*    blog.likes += 1;
+       blog.user = user; */
+    const temp_blog = { ...blog, likes: blog.likes + 1 };
+    const updated_blog = await blogService.updateFull(temp_blog.id, temp_blog);
     setLike(updated_blog.likes);
+    dispatch(UpdateBlogsById(temp_blog));
   };
   const handleDeleteBlog = async () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
@@ -28,7 +36,8 @@ const Blog = ({ blog, user, blogs, setBlogs, blogService }) => {
           if (a.likes < b.likes) return -1;
           return 0;
         });
-        setBlogs(sorted_list);
+        //  setBlogs(sorted_list);
+        dispatch(UpdateBlogs(sorted_list))
       });
     }
   };

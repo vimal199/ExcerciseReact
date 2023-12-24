@@ -6,16 +6,24 @@ import loginService from "./services/login";
 import blogService from "./services/blogs";
 import Notification from "./components/Notification";
 import Toggable from "./components/Toggable";
+import { createMessage } from "./reducers/messageReducer";
+import { InitialiseBlogs, UpdateBlogs } from "./reducers/blogsReducer";
+import { setUser } from "./reducers/userReducer";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 const App = () => {
   console.log("Starting Blog application");
-  const [blogs, setBlogs] = useState([]);
+  const dispatch = useDispatch();
+  // const [blogs, setBlogs] = useState([]);
+  const blogs = useSelector(state => state.blogs);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
+  //const [user, setUser] = useState(null);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
-  const [message, setMessage] = useState("");
+  //const [message, setMessage] = useState("");
+  const user = useSelector(state => state.user)
   const toggableRef = useRef();
   useEffect(() => {
     blogService.getAll().then((blogs) => {
@@ -24,7 +32,8 @@ const App = () => {
         if (a.likes < b.likes) return 1;
         return 0;
       });
-      setBlogs(sorted_list);
+      //setBlogs(sorted_list);
+      dispatch(InitialiseBlogs(sorted_list))
     });
   }, []);
   useEffect(() => {
@@ -32,7 +41,8 @@ const App = () => {
     if (browserUser) {
       console.log("Token in browser ", browserUser);
       const blog_user = JSON.parse(browserUser);
-      setUser(blog_user);
+      // setUser(blog_user);
+      dispatch(setUser(blog_user))
       blogService.setToken(blog_user.token);
     }
   }, []);
@@ -73,13 +83,16 @@ const App = () => {
      }
      ) */
     const new_blogs = [saved_blog].concat(blogs);
-    setBlogs(new_blogs); /////
+    //setBlogs(new_blogs);
+    dispatch(UpdateBlogs(new_blogs));
     setTitle("");
     setAuthor("");
     setUrl("");
-    setMessage(`a new blog ${saved_blog.title} by ${saved_blog.author}`);
+    //setMessage(`a new blog ${saved_blog.title} by ${saved_blog.author}`);
+    dispatch(createMessage(`a new blog ${saved_blog.title} by ${saved_blog.author}`))
     setTimeout(() => {
-      setMessage(null);
+      //setMessage(null);
+      dispatch(createMessage(null))
     }, 4000);
     toggableRef.current.toggleVisibility();
   };
@@ -87,7 +100,7 @@ const App = () => {
     event.preventDefault();
     try {
       const login_out = await loginService.login({ userName, password });
-      setUser(login_out);
+      dispatch(setUser(login_out));
       setUserName("");
       setPassword("");
       blogService.setToken(login_out.token);
@@ -98,9 +111,11 @@ const App = () => {
       console.log("Logged in user ", login_out);
     } catch (error) {
       console.log("Error while logging ", error.response.data.error);
-      setMessage(error.response.data.error);
+      //setMessage(error.response.data.error);
+      dispatch(createMessage(error.response.data.error))
       setTimeout(() => {
-        setMessage(null);
+        // setMessage(null);
+        dispatch(createMessage(null))
       }, 4000);
     }
   };
@@ -113,7 +128,6 @@ const App = () => {
         handleOnChangeUserName={handleOnChangeUserName}
         handleOnChangePassword={handleOnChangePassword}
         handleLoginSubmit={handleLoginSubmit}
-        message={message}
       ></LoginForm>
     );
   };
@@ -140,7 +154,7 @@ const App = () => {
       {user != null && (
         <div>
           <h2>blogs</h2>
-          <Notification message={message} status="success"></Notification>
+          <Notification status="success"></Notification>
           {user.name} logged in
           <input
             type="button"
@@ -157,8 +171,6 @@ const App = () => {
               key={blog.id}
               blog={blog}
               user={user}
-              blogs={blogs}
-              setBlogs={setBlogs}
               blogService={blogService}
             />
           ))}
