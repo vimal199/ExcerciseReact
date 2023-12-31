@@ -16,8 +16,8 @@ const create = (savedBlog) => {
   const req = axios.post(baseUrl, savedBlog, config);
   return req.then((response) => response.data);
 };
-const updateFull = (id, inputBlog) => {
-  const request = axios.put(`${baseUrl}/${id}`, inputBlog);
+const updateFull = (inputBlog) => {
+  const request = axios.put(`${baseUrl}/${inputBlog.id}`, inputBlog);
   return request.then((response) => response.data);
 };
 const delete_blog = (id) => {

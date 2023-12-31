@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import Blog from "./components/Blog";
 import LoginForm from "./components/LoginForm";
 import BlogForm from "./components/BlogForm";
@@ -6,16 +6,19 @@ import loginService from "./services/login";
 import blogService from "./services/blogs";
 import Notification from "./components/Notification";
 import Toggable from "./components/Toggable";
-import { createMessage } from "./reducers/messageReducer";
+//import { createMessage } from "./reducers/messageReducer";
 import { InitialiseBlogs, UpdateBlogs } from "./reducers/blogsReducer";
-import { setUser } from "./reducers/userReducer";
+//import { setUser } from "./reducers/userReducer";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
+import MessageContext from "./contexts/MessageContext";
+import { useQuery } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import UserContext from "./contexts/UserContext";
 const App = () => {
   console.log("Starting Blog application");
-  const dispatch = useDispatch();
-  // const [blogs, setBlogs] = useState([]);
-  const blogs = useSelector(state => state.blogs);
+  //const dispatch = useDispatch();
+  // const blogs = useSelector(state => state.blogs);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   //const [user, setUser] = useState(null);
@@ -23,9 +26,11 @@ const App = () => {
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
   //const [message, setMessage] = useState("");
-  const user = useSelector(state => state.user)
+  //const user = useSelector(state => state.user)
+  const [message, messageDispatch] = useContext(MessageContext)
+  const [user, userDispatch] = useContext(UserContext)
   const toggableRef = useRef();
-  useEffect(() => {
+  /* useEffect(() => {
     blogService.getAll().then((blogs) => {
       const sorted_list = blogs.sort((a, b) => {
         if (a.likes > b.likes) return -1;
@@ -35,18 +40,56 @@ const App = () => {
       //setBlogs(sorted_list);
       dispatch(InitialiseBlogs(sorted_list))
     });
-  }, []);
+  }, []); */
   useEffect(() => {
     const browserUser = window.localStorage.getItem("loggedBloggedUser");
     if (browserUser) {
       console.log("Token in browser ", browserUser);
       const blog_user = JSON.parse(browserUser);
       // setUser(blog_user);
-      dispatch(setUser(blog_user))
+      //  userDispatch(setUser(blog_user))
+      userDispatch({ type: 'setUser', payload: blog_user })
       blogService.setToken(blog_user.token);
     }
   }, []);
+  const queryClient = useQueryClient()
+  const newBlogMutation = useMutation({
+    mutationFn: blogService.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    },
+  }
 
+  )
+  /*
+  Replacing getting of data from effect hook with tanstack  
+  */
+  const blogResult = useQuery(
+    {
+      queryKey: ['blogs'],
+      queryFn: blogService.getAll
+    }
+  )
+  if (blogResult.isLoading) {
+    return <div>loading....</div>
+  }
+  console.log('blogResult is', JSON.parse(JSON.stringify(blogResult)))
+  if (blogResult.isSuccess) {
+    console.log('is it success');
+    /*  if (blogs.length == 0) { */
+    console.log('setting to state');
+    /* const sorted_list = [...blogResult.data].sort((a, b) => {
+      if (a.likes > b.likes) return -1;
+      if (a.likes < b.likes) return 1;
+      return 0;
+    }); */
+    //setBlogs(blogResult.data);
+    //dispatch(UpdateBlogs(sorted_list))
+    //}
+
+  }
+  const blogs = blogResult.data;
+  //setBlogs(sorted_list);
   /*   states and variables definition ends here function definitions begins below */
 
   const handleOnChangeUserName = (event) => {
@@ -71,8 +114,9 @@ const App = () => {
       author: author,
       url: url,
     };
-    const saved_blog = await blogService.create(blogToBeSaved);
-    console.log("Form submitted ", saved_blog);
+    //const saved_blog = await blogService.create(blogToBeSaved);
+    newBlogMutation.mutate(blogToBeSaved)
+    // console.log("Form submitted ", saved_blog);
     //const new_blogs = blogs.concat(saved_blog)
     /*  const sorted_list = new_blogs.sort((a, b) => {
        if (a.likes > b.likes)
@@ -82,17 +126,19 @@ const App = () => {
        return 0
      }
      ) */
-    const new_blogs = [saved_blog].concat(blogs);
+    // const new_blogs = [blogToBeSaved].concat(blogs);
     //setBlogs(new_blogs);
-    dispatch(UpdateBlogs(new_blogs));
+    //dispatch(UpdateBlogs(new_blogs));
     setTitle("");
     setAuthor("");
     setUrl("");
     //setMessage(`a new blog ${saved_blog.title} by ${saved_blog.author}`);
-    dispatch(createMessage(`a new blog ${saved_blog.title} by ${saved_blog.author}`))
+    //dispatch(createMessage(`a new blog ${saved_blog.title} by ${saved_blog.author}`))
+    messageDispatch({ type: 'createMessage', payload: `a new blog ${blogToBeSaved.title} by ${blogToBeSaved.author}` })
     setTimeout(() => {
       //setMessage(null);
-      dispatch(createMessage(null))
+      // dispatch(createMessage(null))
+      messageDispatch({ type: 'createMessage', payload: null })
     }, 4000);
     toggableRef.current.toggleVisibility();
   };
@@ -100,7 +146,7 @@ const App = () => {
     event.preventDefault();
     try {
       const login_out = await loginService.login({ userName, password });
-      dispatch(setUser(login_out));
+      userDispatch({ type: 'setUser', payload: login_out })
       setUserName("");
       setPassword("");
       blogService.setToken(login_out.token);
@@ -112,10 +158,12 @@ const App = () => {
     } catch (error) {
       console.log("Error while logging ", error.response.data.error);
       //setMessage(error.response.data.error);
-      dispatch(createMessage(error.response.data.error))
+      // dispatch(createMessage(error.response.data.error))   implement context
+      messageDispatch({ type: 'createMessage', payload: error.response.data.error })
       setTimeout(() => {
         // setMessage(null);
-        dispatch(createMessage(null))
+        //  dispatch(createMessage(null))                     implement context
+        messageDispatch({ type: 'createMessage', payload: null })
       }, 4000);
     }
   };
@@ -147,7 +195,7 @@ const App = () => {
     );
   };
   /* Function definitions ends here.*/
-  // console.log('setBlogs at app ', setBlogs)
+  console.log('Blogs at app ', blogs)
   return (
     <>
       {user == null && loginForm()}

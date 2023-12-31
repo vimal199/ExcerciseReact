@@ -7,6 +7,8 @@ const blogsSlice = createSlice({
             return [
                 ...state, ...action.payload
             ]
+            console.log('action.payload', action.payload);
+            //  return initialState.concat(action.payload)
         },
         UpdateBlogsById(state, action) {
             const temp_blogs = state.map((blog) => blog.id != action.payload.id ? blog : action.payload);
