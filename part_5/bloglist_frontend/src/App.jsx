@@ -2,9 +2,11 @@ import { useState, useEffect, useRef, useContext } from "react";
 import Blog from "./components/Blog";
 import LoginForm from "./components/LoginForm";
 import BlogForm from "./components/BlogForm";
+import Users from "./components/Users"
 import loginService from "./services/login";
 import blogService from "./services/blogs";
 import Notification from "./components/Notification";
+import UserBlogs from "./components/UserBlogs"
 import Toggable from "./components/Toggable";
 //import { createMessage } from "./reducers/messageReducer";
 import { InitialiseBlogs, UpdateBlogs } from "./reducers/blogsReducer";
@@ -15,6 +17,8 @@ import MessageContext from "./contexts/MessageContext";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import UserContext from "./contexts/UserContext";
+import { Routes, Route, Link } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 const App = () => {
   console.log("Starting Blog application");
   //const dispatch = useDispatch();
@@ -30,6 +34,7 @@ const App = () => {
   const [message, messageDispatch] = useContext(MessageContext)
   const [user, userDispatch] = useContext(UserContext)
   const toggableRef = useRef();
+  const navigate = useNavigate()
   /* useEffect(() => {
     blogService.getAll().then((blogs) => {
       const sorted_list = blogs.sort((a, b) => {
@@ -57,6 +62,7 @@ const App = () => {
     mutationFn: blogService.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blogs'] })
+      queryClient.invalidateQueries({ queryKey: ['users'] })
     },
   }
 
@@ -155,6 +161,9 @@ const App = () => {
         JSON.stringify(login_out),
       );
       console.log("Logged in user ", login_out);
+      if (login_out) {
+        navigate('/users')
+      }
     } catch (error) {
       console.log("Error while logging ", error.response.data.error);
       //setMessage(error.response.data.error);
@@ -210,7 +219,9 @@ const App = () => {
             value="logout"
             onClick={() => {
               window.localStorage.removeItem("loggedBloggedUser");
+              navigate('/');
               location.reload();
+
             }}
           ></input>
           {blogForm()}
@@ -224,6 +235,11 @@ const App = () => {
           ))}
         </div>
       )}
+      <Routes>
+        <Route path="/users" element={user != null && <Users />} />
+        <Route path="/" element={null} />
+        <Route path="/users/:id" element={<UserBlogs />}></Route>
+      </Routes>
     </>
   );
 };

@@ -23,7 +23,13 @@ usersRouter.post("/", async (request, response) => {
   response.status(201).json(savedUser);
 });
 usersRouter.get("/", async (request, response) => {
-  const allUsers = await User.find({}).populate("blogs");
+  const allUsers = await User.find({});
   response.json(allUsers);
 });
+usersRouter.get("/:id", async (request, response) => {
+  const users = await User.findById(request.params.id).populate("blogs");
+  response.json(users);
+}
+
+);
 module.exports = usersRouter;

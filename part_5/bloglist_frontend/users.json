@@ -1,0 +1,19 @@
+{
+    "users": [
+        {
+            "id": "1",
+            "user": "Artos Hellas",
+            "NumberOfBlogs": 6
+        },
+        {
+            "id": "653aa558f7fb9da4096c0eb2",
+            "user": "Matti Luukkainen",
+            "NumberOfBlogs": 2
+        },
+        {
+            "id": "3",
+            "user": "Venla Ruuska",
+            "NumberOfBlogs": 0
+        }
+    ]
+}

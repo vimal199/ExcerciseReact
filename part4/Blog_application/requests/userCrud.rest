@@ -1,11 +1,11 @@
 
-POST http://localhost:3003/api/login
+POST http://localhost:3003/api/users
 Content-Type : application/json
 
 {
-     "name": "Tofgfgf",
-            "userName": "Dadfdfdf",
-            "password": "Xyz@123456"
+     "name": "Venla Ruuska",
+     "userName": "Venla",
+     "password": "Xyz@123456"
 }
 ###
 GET http://localhost:3003/api/users
@@ -14,7 +14,9 @@ POST http://localhost:3003/api/login
 Content-Type : application/json
 
 {
-    "name"     : "Tony",
-    "userName"   : "David",
+    "name"     : "Arto Hellas",
+    "userName"   : "Arto",
     "password" : "Xyz@123456"
 }
+###
+GET http://localhost:3003/api/users/653aa558f7fb9da4096c0eb2
