@@ -1,5 +1,6 @@
 import Notification from "./Notification";
 import PropTypes from "prop-types";
+import { Form, Button } from "react-bootstrap";
 const LoginForm = ({
   userName,
   handleOnChangeUserName,
@@ -10,9 +11,9 @@ const LoginForm = ({
   // console.log("message in login form ", message);
   return (
     <>
-      <h1>log in to application</h1>
+      <h1>Log in to application</h1>
       <Notification status="error"></Notification>
-      <form onSubmit={handleLoginSubmit}>
+      <Form onSubmit={handleLoginSubmit}>
         <div>
           userName
           <input
@@ -21,6 +22,7 @@ const LoginForm = ({
             onChange={handleOnChangeUserName}
             name="userName"
             id="userName"
+            style={{ marginLeft: "1%" }}
           ></input>
         </div>
         <div>
@@ -31,12 +33,13 @@ const LoginForm = ({
             name="password"
             id="password"
             onChange={handleOnChangePassword}
+            style={{ marginLeft: "1.3%" }}
           ></input>
         </div>
-        <button id="login" type="submit">
+        <Button id="login" type="submit" style={{ marginTop: "1%" }}>
           Log in
-        </button>
-      </form>
+        </Button>
+      </Form>
     </>
   );
 };

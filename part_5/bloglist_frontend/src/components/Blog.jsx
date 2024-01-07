@@ -4,9 +4,10 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { InitialiseBlogs, UpdateBlogsById, UpdateBlogs } from "../reducers/blogsReducer";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 //import blogService from '../services/blogs'
 const Blog = ({ blog, user, blogService }) => {
-  console.log("user in blog enter", blog.user.userName);
+  //console.log("user in blog enter", blog.user.userName);
   //console.log('setBlogs ', setBlogs)
   const [status, setStatus] = useState("view");
   const [like, setLike] = useState(blog.likes);
@@ -29,9 +30,9 @@ const Blog = ({ blog, user, blogService }) => {
       }
     }
   )
-  const deleteButtonHidden = {
-    display: user.userName == blog.user.userName ? "" : "none",
-  };
+  /*  const deleteButtonHidden = {
+     display: user.userName == blog.user.userName ? "" : "none",
+   }; */
   const handleClickView = () => {
     setStatus(status == "view" ? "hide" : "view");
   };
@@ -71,28 +72,8 @@ const Blog = ({ blog, user, blogService }) => {
   };
   return (
     <div style={blogStyle} className="blog">
-      {blog.title} {blog.author}
-      <input type="button" onClick={handleClickView} value={status}></input>
-      <div style={toggleVisible} className="blogDetails">
-        <p>{blog.url}</p>
-        <p>
-          likes {like}{" "}
-          <input
-            type="button"
-            onClick={handleClickLikes}
-            value="likes"
-            id="like"
-          ></input>{" "}
-        </p>
-        <p> {blog.user.name}</p>
-        <input
-          style={deleteButtonHidden}
-          type="button"
-          onClick={handleDeleteBlog}
-          value="remove"
-          className="deleteBlog"
-        ></input>
-      </div>
+      <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+      {/* <input type="button" onClick={handleClickView} value={status}></input> */}
     </div>
   );
 };

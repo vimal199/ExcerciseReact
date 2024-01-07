@@ -1,6 +1,6 @@
 GET http://localhost:3003/api/users
 ###
-POST http://localhost:3001/api/blogs
+POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
@@ -13,3 +13,5 @@ Content-Type: application/json
 ###
 POST http://localhost:3001/api/testing/reset
 Content-Type: application/json
+###
+GET http://localhost:3003/api/blogs/65970d9d08ed541416f07deb

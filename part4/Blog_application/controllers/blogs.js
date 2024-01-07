@@ -9,7 +9,8 @@ blogsRouter.get("/", async (request, response) => {
   response.json(blogs);
 });
 blogsRouter.get("/:id", async (request, response) => {
-  const blog = await Blog.findById(request.params.id);
+  const blog = await Blog.findById(request.params.id).populate("user");
+  //console.log('get blog by id ', blog);
   if (blog) {
     response.json(blog);
   } else {
@@ -87,6 +88,20 @@ blogsRouter.put("/:id", async (request, response) => {
     runValidators: true,
     context: "query",
   });
+  response.json(updatedBlog);
+});
+blogsRouter.post("/:id/comment", async (request, response) => {
+  console.log('at post of comment', request.body.comment);
+  const blog_data = await Blog.findById(request.params.id);
+  //const updatedBlog = [...getBlog, comments.concat('temp')]
+  blog_data.comments = blog_data.comments.concat(request.body.comment);
+  console.log('updatedBlog after push', blog_data);
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog_data, {
+    new: true,
+    runValidators: true,
+    context: "query",
+  })
+  console.log('updatedBlog', updatedBlog);
   response.json(updatedBlog);
 });
 module.exports = blogsRouter;

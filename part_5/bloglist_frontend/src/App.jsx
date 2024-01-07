@@ -19,6 +19,9 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import UserContext from "./contexts/UserContext";
 import { Routes, Route, Link } from 'react-router-dom'
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { Nav, Navbar } from "react-bootstrap";
+import { ListGroup } from "react-bootstrap";
 const App = () => {
   console.log("Starting Blog application");
   //const dispatch = useDispatch();
@@ -162,7 +165,7 @@ const App = () => {
       );
       console.log("Logged in user ", login_out);
       if (login_out) {
-        navigate('/users')
+        // navigate('/users')
       }
     } catch (error) {
       console.log("Error while logging ", error.response.data.error);
@@ -203,16 +206,119 @@ const App = () => {
       </Toggable>
     );
   };
+  const Blogdetails = () => {
+    const queryClient = useQueryClient()
+    const [comment, setComment] = useState('');
+    const blogId = useParams().id
+    const updateCommentMutation = useMutation(
+      {
+        mutationFn: blogService.updateComment,
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['blog'] })
+        }
+      }
+    )
+    const handleChangeComment = (event) => {
+      event.preventDefault();
+      const comment_data = {
+        comment: comment, id: blogId
+      }
+      updateCommentMutation.mutate(comment_data)
+      messageDispatch({ type: 'createMessage', payload: `${comment} added by ${user.name}` })
+      setTimeout(() => {
+        messageDispatch({ type: 'createMessage', payload: null })
+      }, 5000);
+    }
+    const updateBlogMutation = useMutation(
+      {
+        mutationFn: blogService.updateFull,
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['blog'] })
+        }
+      }
+    )
+    const blogResult = useQuery(
+      {
+        queryKey: ['blog'],
+        queryFn: () => blogService.getBlogById(blogId)
+      }
+    )
+    if (blogResult.isLoading) {
+      return (
+        <div>Loading.......</div>
+      )
+    }
+    const blog = blogResult.data
+    console.log('blog', blog);
+    //const [like, setLike] = useState(blog.likes);
+    const handleClickLikes = async () => {
+      console.log('Liked blog ', blog);
+      /*    blog.likes += 1;
+         blog.user = user; */
+      const temp_blog = { ...blog, likes: blog.likes + 1 };
+      // const updated_blog = await blogService.updateFull(temp_blog.id, temp_blog);
+      updateBlogMutation.mutate(temp_blog)
+      // setLike(temp_blog.likes);
+      // dispatch(UpdateBlogsById(temp_blog));
+    };
+    return (
+      <div>
+        <p>{blog.url}</p>
+        <p>
+          likes {blog.likes}
+          <input
+            type="button"
+            onClick={handleClickLikes}
+            value="likes"
+            id="like"
+          ></input>
+        </p>
+        <p>added by {blog.user.name}</p>
+        <h2>comments</h2>
+        <form onSubmit={handleChangeComment}>
+          <input
+            type="text"
+            id="comment"
+            name="comment"
+            value={comment}
+            onChange={(event) => setComment(event.target.value)}></input>
+          <button type="submit" id="bwcomment">add comment</button>
+        </form>
+        <ListGroup>
+          {blog.comments && blog.comments.map(comment_blog => <ListGroup.Item key={comment_blog}>{comment_blog}</ListGroup.Item>)}
+        </ListGroup>
+      </div>
+    )
+  }
   /* Function definitions ends here.*/
   console.log('Blogs at app ', blogs)
   return (
-    <>
+    <div className="container">
       {user == null && loginForm()}
       {user != null && (
         <div>
-          <h2>blogs</h2>
           <Notification status="success"></Notification>
-          {user.name} logged in
+          {/* <Link to={'/blogs'} >blogs </Link>
+
+          <Link to={'/users'} >users </Link>
+          {user.name} logged in */}
+          <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+            <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+            <Navbar.Collapse id="responsive-navbar-nav">
+              <Nav className="me-auto">
+                <Nav.Link href="#" as="span">
+                  <Link to={'/blogs'} >blogs </Link>
+
+                </Nav.Link>
+                <Nav.Link href="#" as="span">
+                  <Link to={'/users'} >users </Link>
+                </Nav.Link>
+                <Nav.Link href="#" as="span">
+                  {user.name} logged in
+                </Nav.Link>
+              </Nav>
+            </Navbar.Collapse>
+          </Navbar>
           <input
             type="button"
             id="logout"
@@ -224,23 +330,36 @@ const App = () => {
 
             }}
           ></input>
+          <h1>blog app</h1>
           {blogForm()}
-          {blogs.map((blog) => (
+          {/* {blogs.map((blog) => (
             <Blog
               key={blog.id}
               blog={blog}
               user={user}
               blogService={blogService}
             />
-          ))}
+          ))} */}
         </div>
       )}
       <Routes>
         <Route path="/users" element={user != null && <Users />} />
         <Route path="/" element={null} />
         <Route path="/users/:id" element={<UserBlogs />}></Route>
+
+        <Route path="/blogs" element={
+          blogs.map((blog) => (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              user={user}
+              blogService={blogService}
+            />
+          ))
+        }></Route>
+        <Route path="/blogs/:id" element={<Blogdetails />}></Route>
       </Routes>
-    </>
+    </div>
   );
 };
 export default App;

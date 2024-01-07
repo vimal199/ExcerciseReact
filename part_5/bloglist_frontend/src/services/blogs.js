@@ -27,4 +27,12 @@ const delete_blog = (id) => {
   const request = axios.delete(`${baseUrl}/${id}`, config);
   return request.then((response) => response.data);
 };
-export default { getAll, create, updateFull, delete_blog, setToken };
+const getBlogById = (id) => {
+  const request = axios.get(`${baseUrl}/${id}`)
+  return request.then(response => response.data)
+}
+const updateComment = (comment_data) => {
+  const request = axios.post(`${baseUrl}/${comment_data.id}/comment`, comment_data)
+  return request.then(response => response.data)
+}
+export default { getAll, create, updateFull, delete_blog, getBlogById, setToken, updateComment };

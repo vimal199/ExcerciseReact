@@ -1,3 +1,4 @@
+import { Form, Button } from "react-bootstrap";
 const BlogForm = ({
   title,
   handleChangeTitle,
@@ -10,38 +11,41 @@ const BlogForm = ({
   return (
     <>
       <h2>create new</h2>
-      <form onSubmit={handleSubmitBlog}>
-        <label htmlFor="title">title</label>
+      <Form onSubmit={handleSubmitBlog}>
+        <label htmlFor="title">Title</label>
         <input
           type="text"
           id="title"
           name="title"
           value={title}
           onChange={handleChangeTitle}
+          style={{ marginLeft: "2%" }}
         ></input>
         <br />
-        <label htmlFor="author">author</label>
+        <label htmlFor="author">Author</label>
         <input
           type="text"
           id="author"
           name="author"
           value={author}
           onChange={handleChangeAuthor}
+          style={{ marginLeft: "0.5%" }}
         ></input>
         <br />
-        <label htmlFor="url">url:</label>
+        <label htmlFor="url">Url:</label>
         <input
           type="text"
           id="url"
           name="url"
           value={url}
           onChange={handleChangeUrl}
+          style={{ marginLeft: "2.5%" }}
         ></input>
         <br />
-        <button type="submit" id="bwcreate">
+        <Button type="submit" id="bwcreate" style={{ marginTop: "1%" }}>
           create
-        </button>
-      </form>
+        </Button>
+      </Form>
     </>
   );
 };
