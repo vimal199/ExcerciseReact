@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { ALL_AUTHORS, EDITAUTHOR } from '../queries';
+import Select from 'react-select'
 import React, { useState } from 'react';
 import { gql } from '@apollo/client';
 const Authors = (props) => {
@@ -28,6 +29,14 @@ const Authors = (props) => {
     changeAuthor({ variables: { name, setBornTo } })
     console.log('dfdfd');
   }
+  const AuthorList = () => {
+    return authors.map(
+      (author) => {
+        return { value: author.name, label: author.name }
+      }
+    )
+  }
+  console.log('AuthorList is', AuthorList);
   return (
     <div>
       <h2>authors</h2>
@@ -50,8 +59,9 @@ const Authors = (props) => {
       <div>
         <h2>Set birthyear</h2>
         <form onSubmit={handleUpdateAuthor}>
-          <label htmlFor="name">Name</label><br />
-          <input value={name} name='name' onChange={handleNameChange} /> <br />
+          {/*  <label htmlFor="name">Name</label><br />
+          <input value={name} name='name' onChange={handleNameChange} /> <br /> */}
+          <Select options={AuthorList()} onChange={(selected) => { setName(selected.value) }}></Select>
           <label htmlFor="born">Born</label><br />
           <input value={born} name='born' onChange={handleBornChange} /><br />
           <button type='submit'>update author</button>
