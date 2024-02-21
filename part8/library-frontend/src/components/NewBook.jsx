@@ -2,7 +2,7 @@ import { gql, useMutation } from '@apollo/client';
 import { useState } from 'react'
 import React from 'react';
 import { addBook } from '../queries';
-import { ALL_AUTHORS } from '../queries';
+import { ALL_AUTHORS, ALLBOOKS } from '../queries';
 const NewBook = (props) => {
   if (!props.show) {
     return null
@@ -13,7 +13,16 @@ const NewBook = (props) => {
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
   const [createBooks] = useMutation(addBook, {
-    refetchQueries: [{ query: ALL_AUTHORS }]
+    refetchQueries: [{ query: ALL_AUTHORS }, { query: ALLBOOKS }],
+    /*   update: (cache, response) => {
+        cache.updateQuery({ query: ALLBOOKS }, ({ allBooks }) => {
+          console.log('response data ', x);
+          return {
+            allBooks: allBooks.concat(response.data.addBook)
+          }
+        }
+        )
+      } */
   })
 
   const submit = async (event) => {

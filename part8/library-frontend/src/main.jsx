@@ -1,13 +1,27 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import { ApolloClient, InMemoryCache, gql, ApolloProvider } from '@apollo/client'
-const client = new ApolloClient({
+import App from './App'
+import { ApolloClient, InMemoryCache, gql, ApolloProvider, createHttpLink } from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem("library-user-token")
+  console.log('Token is ', token);
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : null,
+    }
+  }
+}
+)
+const httpLink = createHttpLink({
   uri: 'http://localhost:4001',
+})
+const client = new ApolloClient({
   cache: new InMemoryCache(),
+  link: authLink.concat(httpLink)
 })
 
-console.log(client);
 
 
 
